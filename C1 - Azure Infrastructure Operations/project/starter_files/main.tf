@@ -13,7 +13,7 @@ data "azurerm_image" "image" {
 }
 
 resource "azurerm_virtual_network" "main" {
-  name                = "${var.prefix}-network"
+  name                = "${var.prefix}-Network"
   address_space       = ["10.0.0.0/22"]
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
@@ -34,7 +34,7 @@ resource "azurerm_public_ip" "main" {
 }
 
 resource "azurerm_network_security_group" "main" {
-  name                = "${var.prefix}-nsg"
+  name                = "${var.prefix}-NSG"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
@@ -68,12 +68,13 @@ resource "azurerm_lb" "main" {
 }
 
 resource "azurerm_lb_backend_address_pool" "main" {
-  name            = "${var.prefix}-accpool"
+  name            = "${var.prefix}-AccPool"
   loadbalancer_id = azurerm_lb.main.id
 }
 
 resource "azurerm_network_interface" "main" {
-  name                = "${var.prefix}-nic"
+  for_each = toset(var.vm_names)
+  name                = "${var.prefix}-Nic-${each.value}"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
 
@@ -85,25 +86,27 @@ resource "azurerm_network_interface" "main" {
 }
 
 resource "azurerm_network_interface_backend_address_pool_association" "main" {
-  network_interface_id    = azurerm_network_interface.main.id
-  ip_configuration_name   = "${var.prefix}-nic-ap-assoc"
+  for_each = toset(var.vm_names)
+  network_interface_id    = azurerm_network_interface.main[each.key].id
+  ip_configuration_name   = "${var.prefix}-NicApAssoc-${each.value}"
   backend_address_pool_id = azurerm_lb_backend_address_pool.main.id
 }
 
 resource "azurerm_availability_set" "main" {
-  name                = "${var.prefix}-aset"
+  name                = "${var.prefix}-Aset"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 }
 
 resource "azurerm_linux_virtual_machine" "main" {
-  name                            = "${var.prefix}-vm"
+  for_each = toset(var.vm_names)
+  name                            = "${var.prefix}-${each.value}"
   resource_group_name             = azurerm_resource_group.main.name
   location                        = azurerm_resource_group.main.location
   size                            = "Standard_D2s_v3"
 
   network_interface_ids = [
-    azurerm_network_interface.main.id,
+    azurerm_network_interface.main[each.key].id,
   ]
   availability_set_id = azurerm_availability_set.main.id
 
@@ -112,14 +115,14 @@ resource "azurerm_linux_virtual_machine" "main" {
   }
 
   storage_os_disk {
-    name              = "osdisk"
+    name              = "${each.key}-OsDisk"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
   }
 
   os_profile {
-    computer_name  = "${var.prefix}-hostname"
+    computer_name  = "${var.prefix}-hostname-${each.value}"
     admin_username = var.username
     admin_password = var.password
   }
@@ -130,7 +133,7 @@ resource "azurerm_linux_virtual_machine" "main" {
 }
 
 resource "azurerm_managed_disk" "main" {
-  name                 = "${var.prefix}-disk1"
+  name                 = "${var.prefix}-Disk1"
   location             = azurerm_resource_group.main.location
   resource_group_name  = azurerm_resource_group.main.name
   storage_account_type = "Standard_LRS"

@@ -19,3 +19,9 @@ variable "username" {
 variable "password" {
   description = "Strong password"
 }
+
+variable "vm_names" {
+  description = "Name of the Virtual Machine"
+  type = list(string)
+  default = ["vm1", "vm2"]
+}
