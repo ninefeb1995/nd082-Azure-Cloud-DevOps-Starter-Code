@@ -3,8 +3,13 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "main" {
-  name     = "${var.prefix}-resources"
+  name     = "${var.prefix}-rg"
   location = var.location
+}
+
+data "azurerm_image" "image" {
+  name                = var.packer_image_name
+  resource_group_name = azurerm_resource_group.main.name
 }
 
 resource "azurerm_virtual_network" "main" {
@@ -63,7 +68,7 @@ resource "azurerm_lb" "main" {
 }
 
 resource "azurerm_lb_backend_address_pool" "main" {
-  name = "${var.prefix}-accpool"
+  name            = "${var.prefix}-accpool"
   loadbalancer_id = azurerm_lb.main.id
 }
 
@@ -96,24 +101,31 @@ resource "azurerm_linux_virtual_machine" "main" {
   resource_group_name             = azurerm_resource_group.main.name
   location                        = azurerm_resource_group.main.location
   size                            = "Standard_D2s_v3"
-  admin_username                  = var.username
-  admin_password                  = var.password
-  disable_password_authentication = false
+
   network_interface_ids = [
     azurerm_network_interface.main.id,
   ]
   availability_set_id = azurerm_availability_set.main.id
 
-  source_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "18.04-LTS"
-    version   = "latest"
+  storage_image_reference {
+    id = data.azurerm_image.image.id
   }
 
-  os_disk {
-    storage_account_type = "Standard_LRS"
-    caching              = "ReadWrite"
+  storage_os_disk {
+    name              = "osdisk"
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
+
+  os_profile {
+    computer_name  = "${var.prefix}-hostname"
+    admin_username = var.username
+    admin_password = var.password
+  }
+
+  os_profile_linux_config {
+    disable_password_authentication = false
   }
 }
 
