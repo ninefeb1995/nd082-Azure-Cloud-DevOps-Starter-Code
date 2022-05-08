@@ -73,7 +73,7 @@ resource "azurerm_lb_backend_address_pool" "main" {
 }
 
 resource "azurerm_network_interface" "main" {
-  for_each = toset(var.vm_names)
+  for_each            = toset(var.vm_names)
   name                = "${var.prefix}-Nic-${each.value}"
   resource_group_name = azurerm_resource_group.main.name
   location            = azurerm_resource_group.main.location
@@ -86,7 +86,7 @@ resource "azurerm_network_interface" "main" {
 }
 
 resource "azurerm_network_interface_backend_address_pool_association" "main" {
-  for_each = toset(var.vm_names)
+  for_each                = toset(var.vm_names)
   network_interface_id    = azurerm_network_interface.main[each.key].id
   ip_configuration_name   = "${var.prefix}-NicApAssoc-${each.value}"
   backend_address_pool_id = azurerm_lb_backend_address_pool.main.id
@@ -99,41 +99,49 @@ resource "azurerm_availability_set" "main" {
 }
 
 resource "azurerm_linux_virtual_machine" "main" {
-  for_each = toset(var.vm_names)
+  for_each                        = toset(var.vm_names)
   name                            = "${var.prefix}-${each.value}"
   resource_group_name             = azurerm_resource_group.main.name
   location                        = azurerm_resource_group.main.location
   size                            = "Standard_D2s_v3"
+  admin_username                  = var.username
+  admin_password                  = var.password
+  disable_password_authentication = false
 
   network_interface_ids = [
     azurerm_network_interface.main[each.key].id,
   ]
   availability_set_id = azurerm_availability_set.main.id
 
-  storage_image_reference {
-    id = data.azurerm_image.image.id
+  os_disk {
+    storage_account_type = "Standard_LRS"
+    caching              = "ReadWrite"
   }
 
-  storage_os_disk {
-    name              = "${each.key}-OsDisk"
-    caching           = "ReadWrite"
-    create_option     = "FromImage"
-    managed_disk_type = "Standard_LRS"
-  }
+  source_image_id = data.azurerm_image.image.id
 
-  os_profile {
-    computer_name  = "${var.prefix}-hostname-${each.value}"
-    admin_username = var.username
-    admin_password = var.password
-  }
 
-  os_profile_linux_config {
-    disable_password_authentication = false
-  }
+  # storage_os_disk {
+  #   name              = "${each.key}-OsDisk"
+  #   caching           = "ReadWrite"
+  #   create_option     = "FromImage"
+  #   managed_disk_type = "Standard_LRS"
+  # }
+
+  # os_profile {
+  #   computer_name  = "${var.prefix}-hostname-${each.value}"
+  #   admin_username = var.username
+  #   admin_password = var.password
+  # }
+
+  # os_profile_linux_config {
+  #   disable_password_authentication = false
+  # }
 }
 
 resource "azurerm_managed_disk" "main" {
-  name                 = "${var.prefix}-Disk1"
+  for_each             = toset(var.vm_names)
+  name                 = "${var.prefix}-Disk${each.key}"
   location             = azurerm_resource_group.main.location
   resource_group_name  = azurerm_resource_group.main.name
   storage_account_type = "Standard_LRS"
@@ -142,8 +150,9 @@ resource "azurerm_managed_disk" "main" {
 }
 
 resource "azurerm_virtual_machine_data_disk_attachment" "main" {
-  managed_disk_id    = azurerm_managed_disk.main.id
-  virtual_machine_id = azurerm_linux_virtual_machine.main.id
+  for_each           = toset(var.vm_names)
+  managed_disk_id    = azurerm_managed_disk.main[each.key].id
+  virtual_machine_id = azurerm_linux_virtual_machine.main[each.key].id
   lun                = "10"
   caching            = "ReadWrite"
 }

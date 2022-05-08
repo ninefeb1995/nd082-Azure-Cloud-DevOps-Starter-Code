@@ -17,7 +17,7 @@
 			"managed_image_resource_group_name": "finalproject1-rg",
 			"managed_image_name": "myPackerImage",
 			"location": "East Asia",
-			"vm_size": "GeneralPurpose_B1ls"
+			"vm_size": "Standard_B1ls"
 		}
 	],
 	"provisioners": [
