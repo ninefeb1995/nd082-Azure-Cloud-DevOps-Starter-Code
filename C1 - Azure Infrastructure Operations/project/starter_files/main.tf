@@ -119,24 +119,6 @@ resource "azurerm_linux_virtual_machine" "main" {
   }
 
   source_image_id = data.azurerm_image.image.id
-
-
-  # storage_os_disk {
-  #   name              = "${each.key}-OsDisk"
-  #   caching           = "ReadWrite"
-  #   create_option     = "FromImage"
-  #   managed_disk_type = "Standard_LRS"
-  # }
-
-  # os_profile {
-  #   computer_name  = "${var.prefix}-hostname-${each.value}"
-  #   admin_username = var.username
-  #   admin_password = var.password
-  # }
-
-  # os_profile_linux_config {
-  #   disable_password_authentication = false
-  # }
 }
 
 resource "azurerm_managed_disk" "main" {
