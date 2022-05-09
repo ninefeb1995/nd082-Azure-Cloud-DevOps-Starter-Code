@@ -2,7 +2,9 @@
 
 ### Introduction
 For this project, we have a Packer template and a Terraform template to deploy a customizable, scalable web server in Azure.
+
 Packer template will create an Ubuntu 18.04-LTS SKU as base image.
+
 Terraform will deploy:
 - a Resource Group
 - a Virtual network and a subnet on that virtual network.
@@ -13,6 +15,7 @@ Terraform will deploy:
 - a virtual machine availability set.
 - the managed disks for your virtual machines.
 - the virtual machines using packer image deployed mentioned.
+  
 You can modify a packer image in builder section with your own needs.
 
 
@@ -39,12 +42,14 @@ Once you've collected your dependencies, run these following steps:
    For my case: terraform import azurerm_resource_group.main /subscriptions/xxx-xxx-xxx-xxx-xxx/resourceGroups/finalproject1-rg
 6. See the terraform plan: terraform plan -out solution.plan
 7. Apply terraform plan: terraform apply .\solution.plan
+   
 Go to azure portal and see the result.
  
 
 
 ### Output
 With the number of VMs is 2 as default, there will be:
+
 - 1 image created
 - 4 disks created
 - 1 load balancer created
