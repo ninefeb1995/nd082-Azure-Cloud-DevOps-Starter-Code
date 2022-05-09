@@ -93,10 +93,10 @@ resource "azurerm_network_interface_backend_address_pool_association" "main" {
 }
 
 resource "azurerm_availability_set" "main" {
-  name                = "${var.prefix}-Aset"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-  platform_fault_domain_count  = "2"
+  name                        = "${var.prefix}-Aset"
+  location                    = azurerm_resource_group.main.location
+  resource_group_name         = azurerm_resource_group.main.name
+  platform_fault_domain_count = "2"
 }
 
 resource "azurerm_linux_virtual_machine" "main" {
@@ -120,6 +120,10 @@ resource "azurerm_linux_virtual_machine" "main" {
   }
 
   source_image_id = data.azurerm_image.image.id
+
+  tags = {
+    os = "ubuntu"
+  }
 }
 
 resource "azurerm_managed_disk" "main" {
