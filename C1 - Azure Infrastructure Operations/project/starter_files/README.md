@@ -4,15 +4,15 @@
 For this project, we have a Packer template and a Terraform template to deploy a customizable, scalable web server in Azure.
 Packer template will create an Ubuntu 18.04-LTS SKU as base image.
 Terraform will deploy:
-    a Resource Group
-    a Virtual network and a subnet on that virtual network.
-    a Network Security Group that explicitly allow access to other VMs on the subnet and deny direct access from the internet.
-    a Network Interface.
-    a Public IP.
-    a Load Balancer with a backend address pool and address pool association for the network interface and the load balancer.
-    a virtual machine availability set.
-    the managed disks for your virtual machines.
-    the virtual machines using packer image deployed mentioned.
+    - a Resource Group
+    - a Virtual network and a subnet on that virtual network.
+    - a Network Security Group that explicitly allow access to other VMs on the subnet and deny direct access from the internet.
+    - a Network Interface.
+    - a Public IP.
+    - a Load Balancer with a backend address pool and address pool association for the network interface and the load balancer.
+    - a virtual machine availability set.
+    - the managed disks for your virtual machines.
+    - the virtual machines using packer image deployed mentioned.
 You can modify a packer image in builder section with your own needs.
 
 
@@ -45,11 +45,11 @@ Go to azure portal and see the result.
 
 ### Output
 With the number of VMs is 2 as default, there will be:
-1 image created
-4 disks created
-1 load balancer created
-1 network security group created
-1 public IP address created
-2 regular network interface created
-2 virtual machine created
-1 virtual network created
+- 1 image created
+- 4 disks created
+- 1 load balancer created
+- 1 network security group created
+- 1 public IP address created
+- 2 regular network interface created
+- 2 virtual machine created
+- 1 virtual network created
