@@ -88,7 +88,7 @@ resource "azurerm_network_interface" "main" {
 resource "azurerm_network_interface_backend_address_pool_association" "main" {
   for_each                = toset(var.vm_names)
   network_interface_id    = azurerm_network_interface.main[each.key].id
-  ip_configuration_name   = "${var.prefix}-NicApAssoc-${each.value}"
+  ip_configuration_name   = "internal"
   backend_address_pool_id = azurerm_lb_backend_address_pool.main.id
 }
 
@@ -96,6 +96,7 @@ resource "azurerm_availability_set" "main" {
   name                = "${var.prefix}-Aset"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
+  platform_fault_domain_count  = "2"
 }
 
 resource "azurerm_linux_virtual_machine" "main" {
@@ -103,7 +104,7 @@ resource "azurerm_linux_virtual_machine" "main" {
   name                            = "${var.prefix}-${each.value}"
   resource_group_name             = azurerm_resource_group.main.name
   location                        = azurerm_resource_group.main.location
-  size                            = "Standard_D2s_v3"
+  size                            = "Standard_B1ls"
   admin_username                  = var.username
   admin_password                  = var.password
   disable_password_authentication = false
