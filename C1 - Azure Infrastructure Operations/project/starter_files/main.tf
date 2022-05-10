@@ -37,18 +37,34 @@ resource "azurerm_network_security_group" "main" {
   name                = "${var.prefix}-NSG"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
+}
 
-  security_rule {
-    name                       = "rule1"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "*"
-    source_address_prefix      = "VirtualNetwork"
-    destination_address_prefix = "VirtualNetwork"
-  }
+resource "azurerm_network_security_rule" "AllowVNetToVNet" {
+  name                        = "AllowVNetToVNet"
+  priority                    = 100
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = "VirtualNetwork"
+  destination_address_prefix  = "VirtualNetwork"
+  resource_group_name         = azurerm_resource_group.main.name
+  network_security_group_name = azurerm_network_security_group.main.name
+}
+
+resource "azurerm_network_security_rule" "DenyVNetInboundFromInternet" {
+  name                        = "DenyVNetInboundFromInternet"
+  priority                    = 110
+  direction                   = "Inbound"
+  access                      = "Deny"
+  protocol                    = "*"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = "Internet"
+  destination_address_prefix  = "VirtualNetwork"
+  resource_group_name         = azurerm_resource_group.main.name
+  network_security_group_name = azurerm_network_security_group.main.name
 }
 
 resource "azurerm_subnet_network_security_group_association" "main" {
