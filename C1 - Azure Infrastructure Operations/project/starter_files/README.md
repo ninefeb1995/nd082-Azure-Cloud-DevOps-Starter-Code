@@ -26,8 +26,11 @@ You use variables in your configuration with var.<variable_name> to replace the 
 - Nullable, you can use if the variable can be null within the module.
 
 --> The var declaration can include a default argument. If present, the var is marked as optional and the default value will be used if no value is set when running Terraform.
+
 --> Type constraints are optional.
+
 --> Validation is a block that can specify arbitrary custom validation rules for a particular var.
+
 Ex: variable "location" {
    type = string
    description = "The Azure Region in which all resources in this example should be created."
@@ -37,7 +40,9 @@ Ex: variable "location" {
       error_message = "Sorry, but we only accept East Asia region."
    }
 }
+
 --> Sensitive prevents Terraform from showing its value in the plan or apply output, when you use that variable elsewhere in your configuration.
+
 --> The nullable argument in a variable block controls if the module caller may assign the value null to the var.
 
 You can modify a packer image in builder section with your own needs as well.
