@@ -87,3 +87,15 @@ With the number of VMs is 2 as default, there will be:
 - 2 regular network interface created (from Terraform)
 - 2 virtual machine created (from Terraform)
 - 1 virtual network created (from Terraform)
+   
+   The output from terraform plan:
+   
+   ![image](https://user-images.githubusercontent.com/18424851/167684654-d9122638-6461-4625-9a1d-e86f4acc7867.png)
+   
+   ![image](https://user-images.githubusercontent.com/18424851/167684734-66a247bd-d4aa-4769-bc87-67de1731d5c4.png)
+   
+   The output from building packer image:
+   
+   ![image](https://user-images.githubusercontent.com/18424851/167685911-8e8e324a-d3ca-4d98-8b2f-6c30534c8749.png)
+
+
