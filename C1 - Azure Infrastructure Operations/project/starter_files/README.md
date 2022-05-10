@@ -15,8 +15,32 @@ Terraform will deploy:
 - a virtual machine availability set.
 - the managed disks for your virtual machines.
 - the virtual machines using packer image deployed mentioned.
-  
-You can modify a packer image in builder section with your own needs.
+
+You use variables in your configuration with var.<variable_name> to replace the hard-coded value in this file. Variable blocks of variables.tf file have optional arguments:
+
+- Description, a description to briefly tell the purpose of the variable and display when using this variable.
+- Type, the type of data contained in the variable, the supported type keywords are: string, number, bool, list(<TYPE>), map(<TYPE>), set(<TYPE>), tuple(<TYPE>), object({<ATTR NAME> = <TYPE>, ... }). The keyword any can be used to show that any type is acceptable.
+- Default, the default value.
+- Validation, a block to define validation rules, usually in addition to type constraints.
+- Sensitive, it limits Terraform UI output when the var is used in configuration.
+- Nullable, you can use if the variable can be null within the module.
+
+--> The var declaration can include a default argument. If present, the var is marked as optional and the default value will be used if no value is set when running Terraform.
+--> Type constraints are optional.
+--> Validation is a block that can specify arbitrary custom validation rules for a particular var.
+Ex: variable "location" {
+   type = string
+   description = "The Azure Region in which all resources in this example should be created."
+
+   validation {
+      condition     = var.location == "eastasia"
+      error_message = "Sorry, but we only accept East Asia region."
+   }
+}
+--> Sensitive prevents Terraform from showing its value in the plan or apply output, when you use that variable elsewhere in your configuration.
+--> The nullable argument in a variable block controls if the module caller may assign the value null to the var.
+
+You can modify a packer image in builder section with your own needs as well.
 
 
 ### Getting Started
@@ -50,11 +74,11 @@ Go to azure portal and see the result.
 ### Output
 With the number of VMs is 2 as default, there will be:
 
-- 1 image created
-- 4 disks created
-- 1 load balancer created
-- 1 network security group created
-- 1 public IP address created
-- 2 regular network interface created
-- 2 virtual machine created
-- 1 virtual network created
+- 1 image created (from Packer)
+- 4 disks created (from Terraform)
+- 1 load balancer created (from Terraform)
+- 1 network security group created (from Terraform)
+- 1 public IP address created (from Terraform)
+- 2 regular network interface created (from Terraform)
+- 2 virtual machine created (from Terraform)
+- 1 virtual network created (from Terraform)
